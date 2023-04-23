@@ -3,13 +3,20 @@
     "version": "1.0.0",
     "description": "Fitness app",
     "scripts": {
-      "start": "concurrently \"npm run start --prefix client\" \"npm run start --prefix server\"",
-      "heroku-postbuild": "cd client && npm install && npm run build"
+        "start": "concurrently \"npm run start --prefix client\" \"npm run start --prefix server\"",
+        "heroku-postbuild": "cd client && npm install && npm run build"
     },
     "dependencies": {
-      "concurrently": "^6.4.0"
+        "concurrently": "^6.4.0",
+        "dotenv": "^16.0.3",
+        "pg": "^8.10.0",
+        "pg-hstore": "^2.3.4",
+        "sequelize": "^6.31.0"
     },
     "engines": {
-      "node": "16.x"
+        "node": "16.x"
+    },
+    "devDependencies": {
+        "sequelize-cli": "^6.6.0"
     }
-  }
+}
