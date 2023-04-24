@@ -1,27 +1,37 @@
-exports.up = async function (knex) {
-    // Rename table 'clients' to 'Clients'
-    await knex.schema.renameTable('clients', 'Clients');
-  
-    // Alter table 'Clients'
-    await knex.schema.alterTable('Clients', (table) => {
-      // Drop 'name' column
-      table.dropColumn('name');
-      // Add 'firstName' and 'lastName' columns
-      table.string('firstName').notNullable();
-      table.string('lastName').notNullable();
-    });
+exports.up = function (knex) {
+    return knex.schema
+      .alterTable("clients", (table) => {
+        table.string("firstName", 255).defaultTo("TempFirstName");
+        table.string("lastName", 255).defaultTo("TempLastName");
+      })
+      .then(() => {
+        return knex.raw(
+          `UPDATE "clients" SET "firstName" = split_part("name", ' ', 1), "lastName" = split_part("name", ' ', 2)`
+        );
+      })
+      .then(() => {
+        return knex.schema.alterTable("clients", (table) => {
+          table.string("firstName", 255).notNullable().alter();
+          table.string("lastName", 255).notNullable().alter();
+          table.dropColumn("name");
+        });
+      });
   };
   
-  exports.down = async function (knex) {
-    // Rename table 'Clients' back to 'clients'
-    await knex.schema.renameTable('Clients', 'clients');
-  
-    // Alter table 'clients'
-    await knex.schema.alterTable('clients', (table) => {
-      // Drop 'firstName' and 'lastName' columns
-      table.dropColumn('firstName');
-      table.dropColumn('lastName');
-      // Add 'name' column back
-      table.string('name').notNullable();
-    });
+  exports.down = function (knex) {
+    return knex.schema
+      .alterTable("clients", (table) => {
+        table.string("name").notNullable();
+      })
+      .then(() => {
+        return knex.raw(
+          `UPDATE "clients" SET "name" = "firstName" || ' ' || "lastName"`
+        );
+      })
+      .then(() => {
+        return knex.schema.alterTable("clients", (table) => {
+          table.dropColumn("firstName");
+          table.dropColumn("lastName");
+        });
+      });
   };
