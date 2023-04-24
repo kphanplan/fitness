@@ -1,20 +1,26 @@
-require('dotenv').config({ path: '../.env' });
+require('dotenv').config({ path: './.env' });
 
 module.exports = {
   development: {
     client: 'pg',
-    connection: {
-      host: process.env.DEV_HOST,
-      user: process.env.DEV_USER,
-      password: process.env.DEV_PASS,
-      database: process.env.DEV_NAME,
-      ssl: {
-        rejectUnauthorized: false
-      }
-    },
+    connection: process.env.DATABASE_URL,
     migrations: {
       tableName: 'knex_migrations',
       directory: './migrations'
-    }
+    },
+    ssl: {
+      rejectUnauthorized: false
+    },
+  },
+  production: {
+    client: 'pg',
+    connection: process.env.DATABASE_URL,
+    migrations: {
+      tableName: 'knex_migrations',
+      directory: './migrations'
+    },
+    ssl: {
+      rejectUnauthorized: false
+    },
   }
 };
