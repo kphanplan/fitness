@@ -37,22 +37,24 @@ describe("Client endpoints", () => {
 
     describe("PUT /clients/:id", () => {
         it("Should update a specific client", (done) => {
-            const requestBody = {
-                // Add the fields you want to update here
-            };
-
-            chai
-                .request(server)
-                .put("/clients/1") // Replace 1 with an existing client ID
-                .send(requestBody)
-                .end((err, res) => {
-                    expect(res).to.have.status(200);
-                    expect(res.body).to.be.an("object");
-                    // Add assertions for the updated fields here
-                    done();
-                });
+          const requestBody = {
+            name: "Updated Name", // Updating name field
+            gender: "male", // Updating gender field
+          };
+      
+          chai
+            .request(server)
+            .put("/clients/1") // Replace 1 with an existing client ID
+            .send(requestBody)
+            .end((err, res) => {
+              expect(res).to.have.status(200);
+              expect(res.body).to.be.an("object");
+              expect(res.body.name).to.equal("Updated Name"); // Asserting that the name was updated
+              expect(res.body.gender).to.equal("male"); // Asserting that the gender was updated
+              done();
+            });
         });
-    });
+      });
 });
 
 describe("CheckIn endpoints", () => {
@@ -87,9 +89,13 @@ describe("CheckIn endpoints", () => {
     describe("PUT /checkins/:id", () => {
         it("Should update a specific check-in", (done) => {
             const requestBody = {
-                // Add the fields you want to update here
+                motivationRating: 8,
+                motivationDescription: "Feeling motivated to crush my goals this week!",
+                nutritionAdherenceRating: 7,
+                nutritionAdherenceDescription: "I had a cheat meal over the weekend, but other than that, I've been sticking to my meal plan.",
+                coachResponse: "Great job on sticking to your meal plan! Let's keep up the good work."
             };
-
+    
             chai
                 .request(server)
                 .put("/checkins/1") // Replace 1 with an existing check-in ID
@@ -97,7 +103,11 @@ describe("CheckIn endpoints", () => {
                 .end((err, res) => {
                     expect(res).to.have.status(200);
                     expect(res.body).to.be.an("object");
-                    // Add assertions for the updated fields here
+                    expect(res.body.motivationRating).to.equal(requestBody.motivationRating);
+                    expect(res.body.motivationDescription).to.equal(requestBody.motivationDescription);
+                    expect(res.body.nutritionAdherenceRating).to.equal(requestBody.nutritionAdherenceRating);
+                    expect(res.body.nutritionAdherenceDescription).to.equal(requestBody.nutritionAdherenceDescription);
+                    expect(res.body.coachResponse).to.equal(requestBody.coachResponse);
                     done();
                 });
         });
@@ -136,9 +146,9 @@ describe("PositiveQuestions endpoints", () => {
     describe("PUT /positive-questions/:id", () => {
         it("Should update a specific positive question", (done) => {
             const requestBody = {
-                // Add the fields you want to update here
+                question: "What is something positive that happened to you today?",
             };
-
+    
             chai
                 .request(server)
                 .put("/positive-questions/1") // Replace 1 with an existing positive question ID
@@ -146,15 +156,18 @@ describe("PositiveQuestions endpoints", () => {
                 .end((err, res) => {
                     expect(res).to.have.status(200);
                     expect(res.body).to.be.an("object");
-                    // Add assertions for the updated fields here
+                    expect(res.body.question).to.equal(requestBody.question);
+                    expect(res.body.createdAt).to.be.a("string");
                     done();
                 });
         });
     });
 });
 
-describe("OpenAI Services", () => {
-    describe("POST /generateCoachTemplate", () => {
+describe("OpenAI Services", function() {
+    this.timeout(20000); // set timeout for all tests in this describe block
+
+    describe("POST /generate-coach-response", () => {
         it("Should generate a coach template", (done) => {
             const requestBody = {
                 clientResponse: "I did really well this week.",
@@ -163,7 +176,7 @@ describe("OpenAI Services", () => {
 
             chai
                 .request(server)
-                .post("/generateCoachTemplate")
+                .post("/generate-coach-response")
                 .send(requestBody)
                 .end((err, res) => {
                     expect(res).to.have.status(200);
@@ -174,7 +187,7 @@ describe("OpenAI Services", () => {
         });
     });
 
-    describe("POST /detectTasks", () => {
+    describe("POST /generate-tasks", () => {
         it("Should detect tasks from the coach's response", (done) => {
             const requestBody = {
                 coachResponse: "Let's update your macros to 150P 200C 60F",
@@ -182,7 +195,7 @@ describe("OpenAI Services", () => {
 
             chai
                 .request(server)
-                .post("/detectTasks")
+                .post("/generate-tasks")
                 .send(requestBody)
                 .end((err, res) => {
                     expect(res).to.have.status(200);

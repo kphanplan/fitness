@@ -3,6 +3,7 @@ const cors = require("cors");
 const checkInService = require('./services/checkInService');
 const clientService = require('./services/clientService');
 const positiveQuestionsService = require('./services/positiveQuestionsService');
+const openAIService = require('./services/openaiServices');
 
 // SET UP THE ENDPOINTS
 const app = express();
@@ -31,6 +32,17 @@ app.put("/checkins/:id", async (req, res) => {
   res.json(updatedCheckIn);
 });
 
+app.post('/checkins', async (req, res) => {
+  try {
+    const data = req.body;
+    const newCheckIn = await checkInService.createCheckIn(data);
+    res.json(newCheckIn);
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ error: 'Failed to create CheckinData' });
+  }
+});
+
 // Clients endpoints
 app.get("/clients", async (req, res) => {
   const clients = await clientService.getAllClients();
@@ -47,7 +59,7 @@ app.put("/clients/:id", async (req, res) => {
   res.json(updatedClient);
 });
 
-// PositiveQuestions endpoints
+// Positive Questions endpoints
 app.get("/positive-questions", async (req, res) => {
   const positiveQuestions = await positiveQuestionsService.getAllPositiveQuestions();
   res.json(positiveQuestions);
@@ -63,7 +75,33 @@ app.put("/positive-questions/:id", async (req, res) => {
   res.json(updatedPositiveQuestion);
 });
 
+
+// OpenAI endpoints
+app.post("/generate-coach-response", async (req, res) => {
+  const { clientResponse, coachStyleExamples } = req.body;
+  try {
+    const response = await openAIService.generateCoachTemplate(clientResponse, coachStyleExamples);
+    res.json({ message: response });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ error: "Error generating coach template" });
+  }
+});
+
+app.post("/generate-tasks", async (req, res) => {
+  const { coachResponse } = req.body;
+  try {
+    const tasks = await openAIService.detectTasks(coachResponse);
+    res.json({ tasks });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ error: "Error detecting tasks" });
+  }
+});
+
 // port
-app.listen(PORT, () => {
+const server = app.listen(PORT, () => {
   console.log(`Server is running on port ${PORT}`);
 });
+
+module.exports = server;

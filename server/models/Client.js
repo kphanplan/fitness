@@ -12,7 +12,7 @@ class Client extends Model {
         relation: Model.HasManyRelation,
         modelClass: CheckInData,
         join: {
-          from: 'clients.id',
+          from: 'Clients.id',
           to: 'check_in_data.clientId'
         }
       }

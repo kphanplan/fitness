@@ -14,7 +14,7 @@ class CheckInData extends Model {
         modelClass: Client,
         join: {
           from: 'check_in_data.clientId',
-          to: 'clients.id'
+          to: 'Clients.id'
         }
       },
       positiveQuestion: {
