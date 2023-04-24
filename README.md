@@ -14,11 +14,6 @@ git push heroku master
 Make sure to replace "Your commit message" with an appropriate description of the changes you made in each commit.
 
 # Migrations
-# Sequelize Migrations: Updating a Model
-
-When you need to update a model in your Sequelize project, you should follow these steps to create and run a new migration:
-
-## 1. Create a new migration file
 
 Create a new migration file with npx knex migrate:make <migration_name>
 Edit the migration file to define the changes to the schema
